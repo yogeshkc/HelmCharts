@@ -1,82 +1,26 @@
-# Default values for zeus.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
-
-replicaCount: 1
-
+## Defaults are imported from values.yaml
 image:
-  repository: nginx
-  pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
-
-imagePullSecrets: []
-nameOverride: ""
-fullnameOverride: ""
-
-serviceAccount:
-  # Specifies whether a service account should be created
-  create: true
-  # Annotations to add to the service account
-  annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
-  name: ""
-
-podAnnotations: {}
-
-podSecurityContext: {}
-  # fsGroup: 2000
-
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
-
-service:
-  type: ClusterIP
-  port: 80
-
-ingress:
-  enabled: false
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-  hosts:
-    - host: chart-example.local
-      paths: []
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
-
-resources: {}
+  tag: "b97d9727"
+resources:
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
-
+  limits:
+    cpu: 256m
+    memory: 200Mi
+  requests:
+    cpu: 256m
+    memory: 100Mi
+replicaCount: 2
+# autoscaling is enabled replicaCount is ignored
 autoscaling:
-  enabled: false
-  minReplicas: 1
+  enabled: true 
+  minReplicas: 2
   maxReplicas: 100
   targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
-
-nodeSelector: {}
-
-tolerations: []
-
-affinity: {}
+  targetMemoryUtilizationPercentage: 80
 env:
   useMysql: false
   useLubyanka: true
@@ -90,7 +34,101 @@ env:
     - name: AWS_ENVIRONMENT
       value: "sto-dev"
     - name: GAUSS_RUNNER_IMAGE
-      value: registry.gitlab.com/zeronorth/registry/images/gaussian
+      value: registry.gitlab.com/devloper/registry/images/gaussian
     - name: GAUSS_RUNNER_CMD
       value: 'python3 ${DOCKER_ENTRYPOINT}'
-
+    - name: DOCKERHUB_ORG
+      value: registry.gitlab.com/devloper/registry/images/
+    - name: DOCKERHUB_SECRET
+      value: devloper-docker-gitlab
+    - name: ZEUS_ORCHESTRATOR__ENVIRONMENT
+      value: "development"
+    - name: ZEUS_ORCHESTRATOR__ENVIRONMENT_SHORT
+      value: "dev"
+    - name: TIMEOUT_EXECUTE_COMMAND
+      value: "7200"
+    - name: JOB_RUNNER__TAG
+      value: "dev"
+    - name: LUMBERGH_SERVICE_URL
+      value: http://dev-lumbergh:7323
+    - name: INITRODE_SERVICE_URL
+      value: http://dev-initrode:8888
+    - name: REDIS_HOST
+      value: redis-master
+    - name: ELASTIC_URL
+      value: http://elasticsearch-master:9200
+    - name: ELASTIC_AWS_REGION
+      value: "us-west-2"
+    - name: ELASTIC_AWS_KEY
+      value: "us-west-2"
+    - name: ELASTIC_AWS_SECRET
+      value: "us-west-2"
+    - name: FABRIC_URL
+      value: http://dev-burlap:7223
+    - name: BAMBOO_URL
+      value: http://dev-bamboo:7123
+    - name: ISSUES_API_URL
+      value: http://dev-issues-api:7728
+    - name: DOCKER__CLAIR_HOST
+      value: http://dev-clair:10129
+    - name: DEPLOYMENT_TYPE
+      value: aws
+    - name: SERVICE_NAME
+      value: zeus
+    - name: CONFIGURATION_CHECK_INTERVAL
+      value: "60"
+    - name: OPENVAS_AWS_KEY_NAME
+      value: ""
+    - name: BASIC_AUTH_ZEUS_USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: devloper-secrets
+          key: BASIC_AUTH_ZEUS_USERNAME
+    - name: BASIC_AUTH_ZEUS_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: devloper-secrets
+          key: BASIC_AUTH_ZEUS_PASSWORD
+    - name: MARMALADE_SERVICE_USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: devloper-secrets
+          key: MARMALADE_SERVICE_USERNAME
+    - name: BASIC_AUTH_MARMALADE_SERVICE_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: devloper-secrets
+          key: BASIC_AUTH_MARMALADE_SERVICE_PASSWORD
+    - name: OPENVAS_USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: devloper-secrets
+          key: OPENVAS_USERNAME
+    - name: OPENVAS_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: devloper-secrets
+          key: OPENVAS_PASSWORD
+    - name: REPORTING_RUNNER_USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: devloper-lumbergh
+          key: runner_username
+    - name: REPORTING_RUNNER_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: devloper-lumbergh
+          key: runner_password
+    - name: USE_NODE_SELECTORS
+      value: "1"
+    - name: AWS_S3_REGION
+      value: "us-west-2"
+    - name: CONFIGURATION_MANAGER_URL
+      value: "dev-configuration-service:8500"
+nodeSelector:
+  cloud.google.com/gke-preemptible: "true"
+tolerations:
+  - effect: "NoSchedule"
+    key: "cloud.google.com/gke-preemptible"
+    value: "true"
+    operator: "Equal"
