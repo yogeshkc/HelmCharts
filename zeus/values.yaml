@@ -77,13 +77,20 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
-
-
 env:
-  useMysql: true
+  useMysql: false
   useLubyanka: true
   useStorage: true
   useCronice: false
   useAuth0: false
   useKafka: true
+  vars:
+    - name: GAUSS_RUNNER_NAMESPACE
+      value: "sto-dev"
+    - name: AWS_ENVIRONMENT
+      value: "sto-dev"
+    - name: GAUSS_RUNNER_IMAGE
+      value: registry.gitlab.com/zeronorth/registry/images/gaussian
+    - name: GAUSS_RUNNER_CMD
+      value: 'python3 ${DOCKER_ENTRYPOINT}'
 
