@@ -77,3 +77,13 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+
+env:
+  useMysql: true
+  useLubyanka: true
+  useStorage: true
+  useCronice: false
+  useAuth0: false
+  useKafka: true
+
